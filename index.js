@@ -5,7 +5,7 @@ const WIDTH = canvas.getAttribute('width');
 const worlds = ["mario", "minecraft", "missing"];
 const images = {};
 
-["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall"].forEach(fileName => {
+["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "bg"].forEach(fileName => {
   const img = new Image();
   img.src = `img/${fileName}.png`;
   images[fileName] = img;
@@ -28,6 +28,8 @@ let circle = {
   y: canvas.height / 2,
   vy: 0
 };
+let bgOffset = 0;
+let bgOffsetMax = 1200;
 
 let pipes = [];
 let lasers = [];
@@ -61,8 +63,14 @@ function init() {
 
 function drawBackground() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(images["bg"], -bgOffset, 0);
+  if (bgOffset > 400) {
+    ctx.drawImage(images["bg"], -bgOffset + 1200, 0);
+  }
+  if (bgOffset > 1200) {
+    bgOffset = 0;
+  }
+  bgOffset++;
 }
 
 function drawCircle() {
