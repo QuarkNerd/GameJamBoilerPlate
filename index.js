@@ -5,7 +5,7 @@ const WIDTH = canvas.getAttribute('width');
 const worlds = ["mario", "minecraft", "missing"];
 const images = {};
 
-["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "bg"].forEach(fileName => {
+["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "bg", "ship"].forEach(fileName => {
   const img = new Image();
   img.src = `img/${fileName}.png`;
   images[fileName] = img;
@@ -29,7 +29,6 @@ let circle = {
   vy: 0
 };
 let bgOffset = 0;
-let bgOffsetMax = 1200;
 
 let pipes = [];
 let lasers = [];
@@ -91,11 +90,7 @@ function drawCircle() {
     circle.vy = 0;
   }
 
-  // Draw circle
-  ctx.fillStyle = "green";
-  ctx.beginPath();
-  ctx.arc(circle.x, circle.y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-  ctx.fill();
+  ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
 }
 
 function drawRectangles() {
@@ -200,6 +195,7 @@ let frames = 0;
 
 function handleKeyDown(event) {
   if (event.code === "Space") {
+    event.preventDefault();
     jump();
   }
   if (String.fromCharCode(event.keyCode) === "Q") {
