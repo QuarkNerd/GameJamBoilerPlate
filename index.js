@@ -17,7 +17,7 @@ const CIRCLE_RADIUS = 15;
 let GRAVITY = 0.3;
 let JUMP_SPEED = 10;
 let WALL_SPEED = 3;
-let LASER_SPEED = 4;
+let LASER_SPEED = 15;
 let world;
 
 let playing = false;
@@ -74,6 +74,7 @@ function drawBackground() {
 
 function drawCircle() {
   shouldJump();
+  laser();
 
   // Update circle position
   circle.y += circle.vy;
@@ -137,6 +138,8 @@ function addRectangles() {
 function drawLaser() {
   lasers.forEach(las => {
     las.x += LASER_SPEED;
+    las.vy += GRAVITY;
+    las.y += las.vy;
     ctx.fillStyle = "red";
     ctx.fillRect(las.x, las.y, las.width, las.height);
   });
@@ -194,14 +197,16 @@ function animate() {
 let frames = 0;
 
 function handleKeyDown(event) {
+  event.preventDefault();
   if (event.code === "Space") {
-    event.preventDefault();
+    if (!playing) {
+      window.start();
+    }
     jump();
   }
   if (String.fromCharCode(event.keyCode) === "Q") {
     laser();
   }
-  console.log(String.fromCharCode(event.keyCode));
 }
 
 function handleKeyUp(event) {
@@ -211,14 +216,29 @@ function handleKeyUp(event) {
 }
 
 function laser() {
+  if (!lasering) return;
+  if (frames - lastLaserFrame < 20) return;
+  lastLaserFrame = frames;
   lasers.push({
     x: circle.x + CIRCLE_RADIUS + 4,
     y: circle.y,
+    vy: 0,
     height:10,
     width: 30
   })
 }
 
+let lasering = false;
+let lastLaserFrame = -100;
+
+function startLaser() {
+  lasering = true;
+}
+
+function endLaser() {
+  lasering = false;
+  lastLaserFrame = -100;
+}
 
 let lastJumpFrame=-100;
 function shouldJump(e) {
@@ -245,7 +265,9 @@ function noiseStart(e) {
   //   jump();
   // }
 
-  e.detail.highPitch ? laser() : jump();
+  startLaser();
+
+  // e.detail.highPitch ? laser() : jump();
 }
 
 let worldNum;
@@ -262,8 +284,8 @@ window.start = function start() {
   // Add event listener for spacebar
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
-  window.addEventListener("noiseStart", noiseStart);
-  window.addEventListener("noiseStop", unjump);
+  window.addEventListener("noiseStart", startLaser);
+  window.addEventListener("noiseStop", endLaser);
   document.getElementById('start').blur();
 }
 

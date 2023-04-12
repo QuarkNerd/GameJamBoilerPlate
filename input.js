@@ -4,7 +4,7 @@ let analyser;
 let currentPitch = 0, currentVolume = 0;
 let smoothing = 4;
 let volumeThreshold = 75;
-let MIN_VOL_THRESHOLD = 125;
+let MIN_VOL_THRESHOLD = 100;
 let PITCH_THRESHOLD = 450;
 let above = false;
 
