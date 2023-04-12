@@ -4,20 +4,49 @@ let analyser;
 let currentPitch = 0, currentVolume = 0;
 let smoothing = 2;
 let volumeThreshold = 20;
-let MIN_VOL_THRESHOLD = 200;
+let MIN_VOL_THRESHOLD = 100;
+let PITCH_THRESHOLD = 300;
 let above = false;
 
+let currentVolText = document.getElementById("vol");
+
+function updateVolThreshold(e) {
+    MIN_VOL_THRESHOLD = e.target.value;
+}
+
+function updatePitchThreshold(e) {
+    PITCH_THRESHOLD = e.target.value;
+}
+
 async function init() {
+    const volThresholdInput = document.getElementById("volThreshold");
+    volThresholdInput.value = MIN_VOL_THRESHOLD;
+    volThresholdInput.addEventListener("input", updateVolThreshold);
+
+    const pitchThresholdInput = document.getElementById("pitchThreshold");
+    pitchThresholdInput.value = PITCH_THRESHOLD;
+    pitchThresholdInput.addEventListener("input", updatePitchThreshold);
+
     analyser = ac.createAnalyser();
-    analyser.fftSize = 4096;
+    analyser.fftSize = 2048;
     analyser.minDecibels = -90;
     analyser.maxDecibels = -10;
     analyser.smoothingTimeConstant = 0.05;
 
-    let source = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let source = await navigator.mediaDevices.getUserMedia({
+        audio: {
+            latency: 0.02,
+            echoCancellation: false,
+            mozNoiseSuppression: false,
+            noiseSuppression: false,
+            mozAutoGainControl: false,
+            autoGainControl: false,
+            sampleRate: 22500
+        }
+    });
 
-    let lowPass = new BiquadFilterNode(ac, { frequency : 4000, type: "lowpass" });
-    let highPass = new BiquadFilterNode(ac, { frequency : 20, type: "highpass" });
+    let lowPass = new BiquadFilterNode(ac, { frequency : 6000, type: "lowpass" });
+    let highPass = new BiquadFilterNode(ac, { frequency : 10, type: "highpass" });
 
     let stream = ac.createMediaStreamSource(source);
     stream.connect(lowPass);
@@ -43,7 +72,7 @@ function analyse() {
     let maxVol = 0;
     let pitch = 0;
     for (let i=1; i<bufferLength-1; i++) {
-        let slidingWindow = buffer[i-1] + buffer[i] + buffer[i+1];
+        let slidingWindow = (buffer[i-1] + buffer[i] + buffer[i+1]) / 3;
         if (slidingWindow > volumeThreshold) {
             if (slidingWindow > maxVol) {
                 maxVol = slidingWindow;
@@ -55,9 +84,10 @@ function analyse() {
     currentPitch = smooth(currentPitch, pitch);
     currentVolume = smooth(currentVolume, maxVol);
 
+    currentVolText.innerHTML = currentVolume.toFixed(1);
 
     if (currentVolume > MIN_VOL_THRESHOLD) {
-        if (!above) window.dispatchEvent(new Event("noiseStart"));
+        if (!above) window.dispatchEvent(new CustomEvent("noiseStart", { detail: { highPitch : currentPitch >= PITCH_THRESHOLD }}));
         above = true;
     } else {
         if (currentVolume <= MIN_VOL_THRESHOLD) {

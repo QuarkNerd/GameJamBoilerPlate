@@ -156,7 +156,7 @@ function laser() {
 
 
 let lastJumpFrame=-100;
-function jump() {
+function jump(e) {
   if (frames - lastJumpFrame < 30) return;
   lastJumpFrame = frames;
   circle.vy = JUMP_SPEED;

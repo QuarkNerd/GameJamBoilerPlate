@@ -13,6 +13,11 @@
     <script type="module" src="index.js"></script>
     <script type="module" src="input.js"></script>
     <button id="start" onclick="start()">Start</button>
+    <p>Current volume: <span id="vol">n/a</span></p>
     <p id="score"></p>
+    <br>
+    <p>Config</p>
+    <span>Volume threshold </span><input type="number" min="0" max="255" value="50" id="volThreshold">
+    <span>Pitch threshold </span><input type="number" min="0" max="10000" value="300" id="pitchThreshold">
   </body>
 </html>
