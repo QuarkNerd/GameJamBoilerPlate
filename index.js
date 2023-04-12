@@ -20,6 +20,17 @@ let circle = {
 let pipes = [];
 let lasers = [];
 
+function init() {
+  circle = {
+    x: CIRCLE_RADIUS + 10,
+    y: canvas.height / 2,
+    vy: 0
+  };
+  score = 0;
+  pipes = [];
+  lasers = [];
+}
+
 function drawBackground() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
@@ -167,6 +178,7 @@ function unjump() {
 }
 
 window.start = function start() {
+  init();
   if (playing) return;
   playing = true;
   animate();
