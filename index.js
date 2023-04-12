@@ -2,6 +2,14 @@ const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
 const HEIGHT = canvas.getAttribute('height');
 const WIDTH = canvas.getAttribute('width');
+const worlds = ["mario", "minecraft", "missing"];
+const images = {};
+
+["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall"].forEach(fileName => {
+  const img = new Image();
+  img.src = `img/${fileName}.png`;
+  images[fileName] = img;
+})
 
 ctx.strokeStyle = "red";
 
@@ -10,6 +18,7 @@ let GRAVITY = 0.3;
 let JUMP_SPEED = 10;
 let WALL_SPEED = 3;
 let LASER_SPEED = 4;
+let world;
 
 let playing = false;
 let jumping = false;
@@ -85,9 +94,24 @@ function drawRectangles() {
   // Draw rectangles
   for (let i = 0; i < pipes.length; i++) {
     const rect = pipes[i];
-    ctx.fillStyle = rect.gap ? "brown" : "green";
     rect.x -= rect.speed;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+
+    // ctx.fillStyle = rect.gap ? "brown" : "green";
+    // ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+    if (rect.gap) {
+      const image = world + "wall";
+      ctx.drawImage(images[image], rect.x, rect.y);
+    } else if (rect.end) {
+      const image = world;
+      ctx.drawImage(images[image], rect.x, rect.y);
+    } else {
+      const image = world;
+      ctx.drawImage(images[image], rect.x, rect.height - 680);
+    }
+
+    // ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   }
   
   // Remove rectangles that have moved off the screen
@@ -99,12 +123,12 @@ function drawRectangles() {
 
 function addRectangles() {
   const RECT_WIDTH = 50;
-  const GAP_HEIGHT = CIRCLE_RADIUS*12;
+  const GAP_HEIGHT = CIRCLE_RADIUS*15;
   const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
   pipes.push({ x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
-  pipes.push({ x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED });
-  
   pipes.push({ x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
+  pipes.push({ x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
+  
 }
 
 function drawLaser() {
@@ -153,7 +177,7 @@ function animate() {
   drawLaser();
   
   // Add rectangles at fixed interval
-  if (frames % 100 === 0) {
+  if (frames % 150 === 0) {
     end = Date.now();
     console.log(`Execution time: ${end - start} ms`);
     start = Date.now();
@@ -209,7 +233,23 @@ function unjump() {
   lastJumpFrame =-100;
 }
 
+function noiseStart(e) {
+  // if (e.detail.highPitch) {
+  //   laser();
+  //   jump();
+  // } else {
+  //   jump();
+  // }
+
+  e.detail.highPitch ? laser() : jump();
+}
+
 window.start = function start() {
+  score = 0;
+  worlds
+  const worldNum = Math.floor(Math.random() * worlds.length);
+  world = worlds[worldNum];
+  document.getElementById("score").innerHTML = score;
   init();
   if (playing) return;
   playing = true;
@@ -218,7 +258,7 @@ window.start = function start() {
   // Add event listener for spacebar
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
-  window.addEventListener("noiseStart", jump);
+  window.addEventListener("noiseStart", noiseStart);
   window.addEventListener("noiseStop", unjump);
   document.getElementById('start').blur();
 }
@@ -229,7 +269,7 @@ window.stop = function stop() {
 
 function incrementscore() {
   score++;
-  document.getElementById("score").innerHTML = score/2;
+  document.getElementById("score").innerHTML = score;
 }
 
 
