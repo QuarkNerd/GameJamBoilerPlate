@@ -15,7 +15,7 @@ ctx.strokeStyle = "red";
 
 const CIRCLE_RADIUS = 15;
 let GRAVITY = 0.3;
-let JUMP_SPEED = 10;
+let JUMP_SPEED = 8;
 let WALL_SPEED = 3;
 let LASER_SPEED = 15;
 let world;
