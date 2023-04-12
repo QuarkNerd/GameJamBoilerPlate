@@ -132,6 +132,8 @@ window.start = function start() {
   // Add event listener for spacebar
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
+  window.addEventListener("noiseStart", jump);
+  window.addEventListener("noiseStop", unjump);
   document.getElementById('start').blur();
 }
 
