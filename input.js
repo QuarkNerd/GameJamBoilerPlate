@@ -3,29 +3,21 @@ let analyser;
 
 let currentPitch = 0, currentVolume = 0;
 let smoothing = 2;
-let volumeThreshold = 20;
-let MIN_VOL_THRESHOLD = 100;
+let volumeThreshold = 30;
+let MIN_VOL_THRESHOLD = 75;
 let PITCH_THRESHOLD = 300;
 let above = false;
 
 let currentVolText = document.getElementById("vol");
 
-function updateVolThreshold(e) {
-    MIN_VOL_THRESHOLD = e.target.value;
-}
-
-function updatePitchThreshold(e) {
-    PITCH_THRESHOLD = e.target.value;
-}
-
 async function init() {
     const volThresholdInput = document.getElementById("volThreshold");
     volThresholdInput.value = MIN_VOL_THRESHOLD;
-    volThresholdInput.addEventListener("input", updateVolThreshold);
+    volThresholdInput.addEventListener("input", e => MIN_VOL_THRESHOLD = e.target.value);
 
     const pitchThresholdInput = document.getElementById("pitchThreshold");
     pitchThresholdInput.value = PITCH_THRESHOLD;
-    pitchThresholdInput.addEventListener("input", updatePitchThreshold);
+    pitchThresholdInput.addEventListener("input", e => PITCH_THRESHOLD = e.target.value);
 
     analyser = ac.createAnalyser();
     analyser.fftSize = 2048;

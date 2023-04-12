@@ -6,10 +6,13 @@ const WIDTH = canvas.getAttribute('width');
 ctx.strokeStyle = "red";
 
 const CIRCLE_RADIUS = 15;
-const GRAVITY = 0.5;
-const JUMP_SPEED = -8;
+let GRAVITY = 0.3;
+let JUMP_SPEED = 10;
+let WALL_SPEED = 3;
+let LASER_SPEED = 4;
 
 let playing = false;
+let jumping = false;
 let score = 0;
 let circle = {
   x: CIRCLE_RADIUS + 10,
@@ -19,6 +22,22 @@ let circle = {
 
 let pipes = [];
 let lasers = [];
+
+const gravityConfig = document.getElementById("gravConfig");
+gravityConfig.value = GRAVITY;
+gravityConfig.addEventListener("input", e => GRAVITY = Number(e.target.value));
+
+const jumpConfig = document.getElementById("jumpConfig");
+jumpConfig.value = JUMP_SPEED;
+jumpConfig.addEventListener("input", e => JUMP_SPEED = Number(e.target.value));
+
+const speedConfig = document.getElementById("speedConfig");
+speedConfig.value = WALL_SPEED;
+speedConfig.addEventListener("input", e => WALL_SPEED = Number(e.target.value));
+
+const laserConfig = document.getElementById("laserConfig");
+laserConfig.value = LASER_SPEED;
+laserConfig.addEventListener("input", e => LASER_SPEED = Number(e.target.value));
 
 function init() {
   circle = {
@@ -38,6 +57,8 @@ function drawBackground() {
 }
 
 function drawCircle() {
+  shouldJump();
+
   // Update circle position
   circle.y += circle.vy;
   circle.vy += GRAVITY;
@@ -47,6 +68,12 @@ function drawCircle() {
     circle.y = canvas.height - CIRCLE_RADIUS;
     circle.vy = 0;
   }
+
+  if (circle.y - CIRCLE_RADIUS < 0) {
+    circle.y = 0 + CIRCLE_RADIUS;
+    circle.vy = 0;
+  }
+
   // Draw circle
   ctx.fillStyle = "green";
   ctx.beginPath();
@@ -72,20 +99,19 @@ function drawRectangles() {
 
 function addRectangles() {
   const RECT_WIDTH = 50;
-  const SPEED = 5;
   const GAP_HEIGHT = CIRCLE_RADIUS*12;
   const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
-  pipes.push({ x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: SPEED });
-  pipes.push({ x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: SPEED });
+  pipes.push({ x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
+  pipes.push({ x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED });
   
-  pipes.push({ x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: SPEED, gap: true });
+  pipes.push({ x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
 }
 
 function drawLaser() {
   lasers.forEach(las => {
+    las.x += LASER_SPEED;
     ctx.fillStyle = "red";
     ctx.fillRect(las.x, las.y, las.width, las.height);
-    las.x += 4;
   });
 }
 
@@ -167,13 +193,19 @@ function laser() {
 
 
 let lastJumpFrame=-100;
-function jump(e) {
+function shouldJump(e) {
+  if (!jumping) return;
   if (frames - lastJumpFrame < 30) return;
   lastJumpFrame = frames;
-  circle.vy = JUMP_SPEED;
+  circle.vy = -JUMP_SPEED;
+}
+
+function jump() {
+  jumping = true;
 }
 
 function unjump() {
+  jumping = false;
   lastJumpFrame =-100;
 }
 
