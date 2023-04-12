@@ -101,13 +101,13 @@ function drawRectangles() {
     // ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 
     if (rect.gap) {
-      const image = world + "wall";
+      const image = rect.world + "wall";
       ctx.drawImage(images[image], rect.x, rect.y);
     } else if (rect.end) {
-      const image = world;
+      const image = rect.world;
       ctx.drawImage(images[image], rect.x, rect.y);
     } else {
-      const image = world;
+      const image = rect.world;
       ctx.drawImage(images[image], rect.x, rect.height - 680);
     }
 
@@ -125,9 +125,9 @@ function addRectangles() {
   const RECT_WIDTH = 50;
   const GAP_HEIGHT = CIRCLE_RADIUS*15;
   const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
-  pipes.push({ x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
-  pipes.push({ x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
-  pipes.push({ x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
+  pipes.push({world, x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
+  pipes.push({world, x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
+  pipes.push({world, x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
   
 }
 
@@ -244,10 +244,10 @@ function noiseStart(e) {
   e.detail.highPitch ? laser() : jump();
 }
 
+let worldNum;
 window.start = function start() {
   score = 0;
-  worlds
-  const worldNum = Math.floor(Math.random() * worlds.length);
+  worldNum = Math.floor(Math.random() * worlds.length);
   world = worlds[worldNum];
   document.getElementById("score").innerHTML = score;
   init();
@@ -270,6 +270,11 @@ window.stop = function stop() {
 function incrementscore() {
   score++;
   document.getElementById("score").innerHTML = score;
+
+  if (score%3 === 0) {
+    worldNum = Math.floor(Math.random() * worlds.length);
+    world = worlds[worldNum];
+  }
 }
 
 
