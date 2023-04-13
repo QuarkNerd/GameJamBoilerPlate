@@ -207,6 +207,7 @@ function handleKeyDown(event) {
   if (String.fromCharCode(event.keyCode) === "Q") {
     laser();
   }
+  
 }
 
 function handleKeyUp(event) {
@@ -272,6 +273,7 @@ function noiseStart(e) {
 
 let worldNum;
 window.start = function start() {
+  ac.resume();
   score = 0;
   worldNum = Math.floor(Math.random() * worlds.length);
   world = worlds[worldNum];

@@ -1,4 +1,5 @@
 let ac = new AudioContext();
+window.ac = ac;
 let analyser;
 
 let currentPitch = 0, currentVolume = 0;
