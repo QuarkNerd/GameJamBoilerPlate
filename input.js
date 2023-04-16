@@ -1,6 +1,5 @@
-let ac = new AudioContext();
-window.ac = ac;
 let analyser;
+const ac = new AudioContext();
 
 let currentPitch = 0, currentVolume = 0;
 let smoothing = 4;
@@ -37,6 +36,8 @@ async function init() {
             sampleRate: 22500
         }
     });
+    // console.log("poola", source.active);
+    source.addEventListener("addtrack", (event) => {console.log("poola", 80008)});
 
     let lowPass = new BiquadFilterNode(ac, { frequency : 6000, type: "lowpass" });
     let highPass = new BiquadFilterNode(ac, { frequency : 10, type: "highpass" });
@@ -45,8 +46,6 @@ async function init() {
     stream.connect(lowPass);
     lowPass.connect(highPass);
     highPass.connect(analyser);
-
-    tick();
 }
 
 function smooth(current, next) {
@@ -54,10 +53,11 @@ function smooth(current, next) {
 }
 
 
-function analyse() {
+function audioLoopTick() {
     const bufferLength = analyser.frequencyBinCount;
     const buffer = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(buffer);
+    // console.log("poola", buffer);
 
     let maxFrequency = (ac.sampleRate / 2);
     let binWidth = maxFrequency / bufferLength;
@@ -74,6 +74,7 @@ function analyse() {
             }
         }
     }
+    // console.log(maxVol);
 
     currentPitch = smooth(currentPitch, pitch);
     currentVolume = smooth(currentVolume, maxVol);
@@ -81,7 +82,7 @@ function analyse() {
     currentVolText.innerHTML = currentVolume.toFixed(1);
 
     if (currentVolume > MIN_VOL_THRESHOLD) {
-        console.log(currentPitch);
+        // console.log(currentPitch);
         if (!above) window.dispatchEvent(new CustomEvent("noiseStart", { detail: { highPitch : currentPitch >= PITCH_THRESHOLD }}));
         above = true;
     } else {
@@ -93,10 +94,11 @@ function analyse() {
 }
 
 
-function tick() {
-    analyse();
-
-    requestAnimationFrame(tick);
-}
+// function tick() {
+//     audioLoopTick();
+//     // requestAnimationFrame(tick);
+// }
 
 await init();
+
+export {audioLoopTick, ac};
