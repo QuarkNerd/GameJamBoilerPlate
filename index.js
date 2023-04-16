@@ -13,8 +13,6 @@ const images = {};
   images[fileName] = img;
 })
 
-ctx.strokeStyle = "red";
-
 const CIRCLE_RADIUS = 15;
 let GRAVITY = 0.3;
 let JUMP_SPEED = 8;
@@ -27,7 +25,7 @@ let jumping = false;
 let score = 0;
 let circle = {
   x: CIRCLE_RADIUS + 10,
-  y: canvas.height / 2,
+  y: HEIGHT / 2,
   vy: 0
 };
 let bgOffset = 0;
@@ -54,7 +52,7 @@ laserConfig.addEventListener("input", e => LASER_SPEED = Number(e.target.value))
 function init() {
   circle = {
     x: CIRCLE_RADIUS + 10,
-    y: canvas.height / 2,
+    y: HEIGHT / 2,
     vy: 0
   };
   score = 0;
@@ -62,8 +60,43 @@ function init() {
   lasers = [];
 }
 
+let end;
+let start = 0;
+let frames = 0;
+
+function animate() {
+  if (!playing) return;
+  updateState();
+  draw();
+  audioLoopTick();
+  requestAnimationFrame(animate);
+}
+
+function draw() {
+  drawBackground();
+  ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
+  drawPipes();
+  drawLaser();
+}
+
+function updateState() {
+  updateShipState();
+  pipes.forEach(pipe => pipe.x -= pipe.speed);
+    if (frames % 150 === 0) {
+      end = Date.now();
+      console.log(`Execution time: ${end - start} ms`);
+      start = Date.now();
+      addPipe();
+    }
+    
+    frames++;
+  fireLaserIfNeeded();
+  checkCollisionPlayerPipe();
+  checkCollisionLaserPipe();
+}
+
 function drawBackground() {
-  ctx.clearRect(0, 0, WIDTH, canvas.height);
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
   ctx.drawImage(images["bg"], -bgOffset, 0);
   if (bgOffset > 400) {
     ctx.drawImage(images["bg"], -bgOffset + 1200, 0);
@@ -74,17 +107,16 @@ function drawBackground() {
   bgOffset++;
 }
 
-function drawCircle() {
-  shouldJump();
-  laser();
+function updateShipState() {
+  jumpIfShould();
 
   // Update circle position
   circle.y += circle.vy;
   circle.vy += GRAVITY;
   
   // Check for collision with bottom of screen
-  if (circle.y + CIRCLE_RADIUS >= canvas.height) {
-    circle.y = canvas.height - CIRCLE_RADIUS;
+  if (circle.y + CIRCLE_RADIUS >= HEIGHT) {
+    circle.y = HEIGHT - CIRCLE_RADIUS;
     circle.vy = 0;
   }
 
@@ -92,15 +124,11 @@ function drawCircle() {
     circle.y = 0 + CIRCLE_RADIUS;
     circle.vy = 0;
   }
-
-  ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
 }
 
-function drawRectangles() {
-  // Draw rectangles
+function drawPipes() {
   for (let i = 0; i < pipes.length; i++) {
     const rect = pipes[i];
-    rect.x -= rect.speed;
 
     if (rect.gap) {
       const image = rect.world + "wall";
@@ -121,7 +149,7 @@ function drawRectangles() {
   }
 }
 
-function addRectangles() {
+function addPipe() {
   const RECT_WIDTH = 50;
   const GAP_HEIGHT = CIRCLE_RADIUS*15;
   const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
@@ -139,6 +167,29 @@ function drawLaser() {
     ctx.fillStyle = "red";
     ctx.fillRect(las.x, las.y, las.width, las.height);
   });
+}
+
+let lasering = false;
+let lastLaserFrame = -100;
+function fireLaserIfNeeded() {
+  if (!lasering) return;
+  if (frames - lastLaserFrame < 20) return;
+  lastLaserFrame = frames;
+  lasers.push({
+    x: circle.x + CIRCLE_RADIUS + 4,
+    y: circle.y,
+    vy: 0,
+    height:10,
+    width: 30
+  })
+}
+
+let lastJumpFrame=-100;
+function jumpIfShould(e) {
+  if (!jumping) return;
+  if (frames - lastJumpFrame < 30) return;
+  lastJumpFrame = frames;
+  circle.vy = -JUMP_SPEED;
 }
 
 function checkCollisionPlayerPipe() {
@@ -167,32 +218,6 @@ function checkCollisionLaserPipe() {
   }
 }
 
-let end;
-let start = 0;
-function animate() {
-  if (!playing) return;
-  drawBackground();
-  drawCircle();
-  drawRectangles();
-  checkCollisionPlayerPipe();
-  checkCollisionLaserPipe();
-  drawLaser();
-  audioLoopTick();
-  
-  // Add rectangles at fixed interval
-  if (frames % 150 === 0) {
-    end = Date.now();
-    console.log(`Execution time: ${end - start} ms`);
-    start = Date.now();
-    addRectangles();
-  }
-  
-  frames++;
-  requestAnimationFrame(animate);
-}
-
-let frames = 0;
-
 function handleKeyDown(event) {
   event.preventDefault();
   if (event.code === "Space") {
@@ -201,10 +226,6 @@ function handleKeyDown(event) {
     }
     jump();
   }
-  if (String.fromCharCode(event.keyCode) === "Q") {
-    laser();
-  }
-  
 }
 
 function handleKeyUp(event) {
@@ -213,22 +234,6 @@ function handleKeyUp(event) {
   }
 }
 
-function laser() {
-  if (!lasering) return;
-  if (frames - lastLaserFrame < 20) return;
-  lastLaserFrame = frames;
-  lasers.push({
-    x: circle.x + CIRCLE_RADIUS + 4,
-    y: circle.y,
-    vy: 0,
-    height:10,
-    width: 30
-  })
-}
-
-let lasering = false;
-let lastLaserFrame = -100;
-
 function startLaser() {
   lasering = true;
 }
@@ -236,14 +241,6 @@ function startLaser() {
 function endLaser() {
   lasering = false;
   lastLaserFrame = -100;
-}
-
-let lastJumpFrame=-100;
-function shouldJump(e) {
-  if (!jumping) return;
-  if (frames - lastJumpFrame < 30) return;
-  lastJumpFrame = frames;
-  circle.vy = -JUMP_SPEED;
 }
 
 function jump() {
