@@ -1,7 +1,9 @@
+import {audioLoopTick, ac} from './input.js';
+
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
-const HEIGHT = canvas.getAttribute('height');
-const WIDTH = canvas.getAttribute('width');
+const HEIGHT = canvas.height;
+const WIDTH = canvas.width;
 const worlds = ["mario", "minecraft", "missing"];
 const images = {};
 
@@ -61,7 +63,7 @@ function init() {
 }
 
 function drawBackground() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, WIDTH, canvas.height);
   ctx.drawImage(images["bg"], -bgOffset, 0);
   if (bgOffset > 400) {
     ctx.drawImage(images["bg"], -bgOffset + 1200, 0);
@@ -100,10 +102,6 @@ function drawRectangles() {
     const rect = pipes[i];
     rect.x -= rect.speed;
 
-
-    // ctx.fillStyle = rect.gap ? "brown" : "green";
-    // ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-
     if (rect.gap) {
       const image = rect.world + "wall";
       ctx.drawImage(images[image], rect.x, rect.y);
@@ -114,8 +112,6 @@ function drawRectangles() {
       const image = rect.world;
       ctx.drawImage(images[image], rect.x, rect.height - 680);
     }
-
-    // ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   }
   
   // Remove rectangles that have moved off the screen
@@ -129,9 +125,9 @@ function addRectangles() {
   const RECT_WIDTH = 50;
   const GAP_HEIGHT = CIRCLE_RADIUS*15;
   const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
-  pipes.push({world, x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
-  pipes.push({world, x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
-  pipes.push({world, x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
+  pipes.push({world, x: WIDTH, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
+  pipes.push({world, x: WIDTH + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
+  pipes.push({world, x: WIDTH, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
   
 }
 
@@ -181,6 +177,7 @@ function animate() {
   checkCollisionPlayerPipe();
   checkCollisionLaserPipe();
   drawLaser();
+  audioLoopTick();
   
   // Add rectangles at fixed interval
   if (frames % 150 === 0) {
