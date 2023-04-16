@@ -13,6 +13,8 @@ const images = {};
   images[fileName] = img;
 })
 
+const idealFrameTime = 1000/60;
+
 const CIRCLE_RADIUS = 15;
 let GRAVITY = 0.3;
 let JUMP_SPEED = 8;
@@ -60,10 +62,6 @@ function init() {
   lasers = [];
 }
 
-let end;
-let start = 0;
-let frames = 0;
-
 function animate() {
   if (!playing) return;
   updateState();
@@ -79,17 +77,23 @@ function draw() {
   drawLaser();
 }
 
+let now;
+let frames = 0;
 function updateState() {
-  updateShipState();
-  pipes.forEach(pipe => pipe.x -= pipe.speed);
-    if (frames % 150 === 0) {
-      end = Date.now();
-      console.log(`Execution time: ${end - start} ms`);
-      start = Date.now();
-      addPipe();
-    }
-    
-    frames++;
+  let effectiveFrameDiff
+  if (!now) {
+    effectiveFrameDiff = 1;
+    now = Date.now();
+  } else {
+    let delta = -now + (now = Date.now());
+    effectiveFrameDiff = delta/idealFrameTime;
+  }
+  frames+=effectiveFrameDiff;
+
+  updateShipState(effectiveFrameDiff);
+  updateLaserState(effectiveFrameDiff);
+  updatePipeState(effectiveFrameDiff);
+
   fireLaserIfNeeded();
   checkCollisionPlayerPipe();
   checkCollisionLaserPipe();
@@ -107,14 +111,12 @@ function drawBackground() {
   bgOffset++;
 }
 
-function updateShipState() {
+function updateShipState(effectiveFrameDiff) {
   jumpIfShould();
 
-  // Update circle position
-  circle.y += circle.vy;
-  circle.vy += GRAVITY;
+  circle.y += circle.vy*effectiveFrameDiff;
+  circle.vy += GRAVITY*effectiveFrameDiff;
   
-  // Check for collision with bottom of screen
   if (circle.y + CIRCLE_RADIUS >= HEIGHT) {
     circle.y = HEIGHT - CIRCLE_RADIUS;
     circle.vy = 0;
@@ -124,6 +126,41 @@ function updateShipState() {
     circle.y = 0 + CIRCLE_RADIUS;
     circle.vy = 0;
   }
+}
+
+function updateLaserState(effectiveFrameDiff) {
+  lasers.forEach(las => {
+    las.x += LASER_SPEED*effectiveFrameDiff;
+    las.vy += GRAVITY*effectiveFrameDiff;
+    las.y += las.vy*effectiveFrameDiff;
+  });
+}
+
+function updatePipeState(effectiveFrameDiff) {
+  pipes.forEach(pipe => pipe.x -= pipe.speed*effectiveFrameDiff);
+  if (pipes.some(rect => rect.x + rect.width <= 0)) {
+    incrementscore();
+    pipes = pipes.filter(rect => rect.x + rect.width >= 0);
+  }
+  addPipesIfNeeded();
+}
+
+let lastPipeFrame = 0;
+function addPipesIfNeeded() {
+    if (frames - lastPipeFrame > 150) {
+      addPipe();
+      lastPipeFrame = frames;
+    }
+}
+
+function addPipe() {
+  const RECT_WIDTH = 50;
+  const GAP_HEIGHT = CIRCLE_RADIUS*15;
+  const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
+  pipes.push({world, x: WIDTH, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
+  pipes.push({world, x: WIDTH + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
+  pipes.push({world, x: WIDTH, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
+  
 }
 
 function drawPipes() {
@@ -141,29 +178,10 @@ function drawPipes() {
       ctx.drawImage(images[image], rect.x, rect.height - 680);
     }
   }
-  
-  // Remove rectangles that have moved off the screen
-  if (pipes.some(rect => rect.x + rect.width <= 0)) {
-    incrementscore();
-    pipes = pipes.filter(rect => rect.x + rect.width >= 0);
-  }
-}
-
-function addPipe() {
-  const RECT_WIDTH = 50;
-  const GAP_HEIGHT = CIRCLE_RADIUS*15;
-  const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
-  pipes.push({world, x: WIDTH, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
-  pipes.push({world, x: WIDTH + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
-  pipes.push({world, x: WIDTH, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
-  
 }
 
 function drawLaser() {
   lasers.forEach(las => {
-    las.x += LASER_SPEED;
-    las.vy += GRAVITY;
-    las.y += las.vy;
     ctx.fillStyle = "red";
     ctx.fillRect(las.x, las.y, las.width, las.height);
   });
@@ -221,9 +239,6 @@ function checkCollisionLaserPipe() {
 function handleKeyDown(event) {
   event.preventDefault();
   if (event.code === "Space") {
-    if (!playing) {
-      window.start();
-    }
     jump();
   }
 }
@@ -277,7 +292,6 @@ window.start = function start() {
   playing = true;
   animate();
   
-  // Add event listener for spacebar
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   window.addEventListener("noiseStart", startLaser);
