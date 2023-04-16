@@ -1,7 +1,8 @@
 let analyser;
 const ac = new AudioContext();
 
-let currentPitch = 0, currentVolume = 0;
+window.currentVolume = 0;
+let currentPitch = 0;
 let smoothing = 4;
 let volumeThreshold = 75;
 let MIN_VOL_THRESHOLD = 100;
@@ -36,8 +37,6 @@ async function init() {
             sampleRate: 22500
         }
     });
-    // console.log("poola", source.active);
-    source.addEventListener("addtrack", (event) => {console.log("poola", 80008)});
 
     let lowPass = new BiquadFilterNode(ac, { frequency : 6000, type: "lowpass" });
     let highPass = new BiquadFilterNode(ac, { frequency : 10, type: "highpass" });
@@ -57,11 +56,9 @@ function audioLoopTick() {
     const bufferLength = analyser.frequencyBinCount;
     const buffer = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(buffer);
-    // console.log("poola", buffer);
 
     let maxFrequency = (ac.sampleRate / 2);
     let binWidth = maxFrequency / bufferLength;
-    // console.log({binWidth});
 
     let maxVol = 0;
     let pitch = 0;
@@ -74,7 +71,6 @@ function audioLoopTick() {
             }
         }
     }
-    // console.log(maxVol);
 
     currentPitch = smooth(currentPitch, pitch);
     currentVolume = smooth(currentVolume, maxVol);
@@ -82,7 +78,6 @@ function audioLoopTick() {
     currentVolText.innerHTML = currentVolume.toFixed(1);
 
     if (currentVolume > MIN_VOL_THRESHOLD) {
-        // console.log(currentPitch);
         if (!above) window.dispatchEvent(new CustomEvent("noiseStart", { detail: { highPitch : currentPitch >= PITCH_THRESHOLD }}));
         above = true;
     } else {
