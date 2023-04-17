@@ -1,7 +1,5 @@
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
-const HEIGHT = canvas.height;
-const WIDTH = canvas.width;
 const worlds = ["mario", "minecraft", "missing"];
 const images = {};
 
@@ -23,7 +21,7 @@ let world;
 let jumping = false;
 let circle = {
   x: CIRCLE_RADIUS + 10,
-  y: HEIGHT / 2,
+  y: canvas.height / 2,
   vy: 0
 };
 
@@ -42,7 +40,7 @@ export function startGame() {
   world = worlds[worldNum];
   circle = {
     x: CIRCLE_RADIUS + 10,
-    y: HEIGHT / 2,
+    y: canvas.height / 2,
     vy: 0
   };
   score = 0;
@@ -91,8 +89,8 @@ function updateShipState(effectiveFrameDiff) {
   circle.y += circle.vy*effectiveFrameDiff;
   circle.vy += GRAVITY*effectiveFrameDiff;
   
-  if (circle.y + CIRCLE_RADIUS >= HEIGHT) {
-    circle.y = HEIGHT - CIRCLE_RADIUS;
+  if (circle.y + CIRCLE_RADIUS >= canvas.height) {
+    circle.y = canvas.height - CIRCLE_RADIUS;
     circle.vy = 0;
   }
 
@@ -130,10 +128,10 @@ function addPipesIfNeeded() {
 function addPipe() {
   const RECT_WIDTH = 50;
   const GAP_HEIGHT = CIRCLE_RADIUS*15;
-  const gapTop = Math.floor(Math.random() * (HEIGHT - GAP_HEIGHT));
-  pipes.push({world, x: WIDTH, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
-  pipes.push({world, x: WIDTH + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
-  pipes.push({world, x: WIDTH, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: HEIGHT - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
+  const gapTop = Math.floor(Math.random() * (canvas.height - GAP_HEIGHT));
+  pipes.push({world, x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
+  pipes.push({world, x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
+  pipes.push({world, x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: canvas.height - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
   
 }
 
