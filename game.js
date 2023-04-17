@@ -5,7 +5,7 @@ const WIDTH = canvas.width;
 const worlds = ["mario", "minecraft", "missing"];
 const images = {};
 
-["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "bg", "ship"].forEach(fileName => {
+["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "ship"].forEach(fileName => {
   const img = new Image();
   img.src = `img/${fileName}.png`;
   images[fileName] = img;
@@ -26,20 +26,17 @@ let circle = {
   y: HEIGHT / 2,
   vy: 0
 };
-let bgOffset = 0;
 
 let pipes = [];
 let lasers = [];
 
 export function gameLoop() {
-  if (!playing) return;
   updateState();
   draw();
 }
 
 let worldNum;
 export function startGame() {
-  if (playing) return;
   score = 0;
   worldNum = Math.floor(Math.random() * worlds.length);
   world = worlds[worldNum];
@@ -61,7 +58,6 @@ export function startGame() {
 }
 
 function draw() {
-  drawBackground();
   ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
   drawPipes();
   drawLaser();
@@ -87,18 +83,6 @@ function updateState() {
   fireLaserIfNeeded();
   checkCollisionPlayerPipe();
   checkCollisionLaserPipe();
-}
-
-function drawBackground() {
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  ctx.drawImage(images["bg"], -bgOffset, 0);
-  if (bgOffset > 400) {
-    ctx.drawImage(images["bg"], -bgOffset + 1200, 0);
-  }
-  if (bgOffset > 1200) {
-    bgOffset = 0;
-  }
-  bgOffset++;
 }
 
 function updateShipState(effectiveFrameDiff) {
