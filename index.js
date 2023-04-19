@@ -62,58 +62,65 @@ function drawSeperator() {
   ctx.stroke();
 }
 
-const intro = [
-  'Welcome to Noisy Gamer. A game that involves your voice.',
-  'Click/tap on the screen or press space to jump upwards. Speak/shout ' +
-    'to fire your laser. Walls will move in from the right, and you can ' + 
-    'eliminate the middle bits with your laser. Your goal is to survive ' + 
-    'as long as you can without hitting a wall. When not playing on easy, ' + 
-    'your firepower is limited and shown on top of the screen',
-  'Adjust the slider on the right to determine the therehold for firing the laser, choose your difficulty and press start'
-]
 function writeIntro() {
-  // console.log(splitString(intro[0], 100));
-  const minimumSideSpace = 20;
-  const maxWidth = canvas.width - 2*minimumSideSpace;
-  ctx.font = '20px Arial';
-  ctx.fillStyle = 'White';
+  const intro = getIntro();
+  ctx.font = `${intro.fontSize}px Arial`;
+  ctx.fillStyle = "White";
 
-
-  intro.forEach(line => {
-    splitString(string, maxWidth)
+  intro.lines.forEach(({ x, y, text }) => {
+    ctx.fillText(text, x, y);
   });
-
-  // const parsedIntro = intro.flatMap(line => {
-  //   const split = line.split(' ');
-  //   const parsedLines = [];
-
-  // });
-
-
-  
-
-  // console.log(ctx.measureText('aaaaaaaaaa').width);
-  ctx.fillText(intro[0], 20, 50, canvas.width - 100);
 }
 
-//calculate only after resize
-function splitString(string, maxWidth) {
-  const split = string.split(' ');
-  const chunks = [];
+function getIntro() {
+  const intro = [
+    "Welcome to Noisy Gamer. A game that involves your voice.",
+    "",
+    "Click/tap on the screen or press space to jump upwards. Speak/shout to fire your laser.",
+    "",
+    "Walls will move in from the right, and you can eliminate the middle bits with your laser. Your goal is to survive as long as you can without hitting a wall. When not playing on easy, your firepower is limited and shown on top of the screen",
+    "",
+    "Adjust the slider on the right to determine the therehold for firing the laser, choose your difficulty and press start",
+  ];
+  const sideGap = 10;
+  const fontSize = 20;
+  const lineHeight = fontSize + 2;
+  const targetWdith = canvas.width / 2 - 2 * sideGap;
+  const parsedIntro = intro.flatMap((st) =>
+    splitStringByLength(st, targetWdith)
+  );
+  const lines = parsedIntro.length;
+  const topGap = (canvas.height - lines * lineHeight) / 2;
+  parsedIntro.forEach((chunk, i) => {
+    chunk.x = (targetWdith - chunk.width) / 2 + sideGap;
+    chunk.y = topGap + lineHeight * i;
+  });
 
-  let currentChunk = { 
-    string: split[0],
-    width
-  };
-  
-  for (let i = 1; i < split.length; i++) {
-    currentChunk += ' ' + split[i];
-    if (ctx.measureText(currentChunk).width > maxWidth) {
-      chunks.push(currentChunk.slice(0, -(split[i].length + 1)));
-      currentChunk = split[i];
+  return { lines: parsedIntro, fontSize };
+}
+
+function splitStringByLength(str, length) {
+  const words = str.split(" ");
+  const chunks = [];
+  let currentChunk = "";
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+
+    if (ctx.measureText(currentChunk + " " + word).width > length) {
+      chunks.push({
+        text: currentChunk.trim(),
+        width: ctx.measureText(currentChunk.trim()).width,
+      });
+      currentChunk = "";
     }
+
+    currentChunk += (currentChunk === "" ? "" : " ") + word;
   }
-  
-  chunks.push(currentChunk);
+
+  chunks.push({
+    text: currentChunk.trim(),
+    width: ctx.measureText(currentChunk.trim()).width,
+  });
   return chunks;
 }
