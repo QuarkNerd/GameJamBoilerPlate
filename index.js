@@ -64,7 +64,7 @@ function drawSeperator() {
 
 function writeIntro() {
   const intro = getIntro();
-  ctx.font = `${intro.fontSize}px Arial`;
+  ctx.font = `${intro.fontSize}px slkscr`;
   ctx.fillStyle = "White";
 
   intro.lines.forEach(({ x, y, text }) => {

@@ -35,7 +35,6 @@ export function gameLoop() {
 
 let worldNum;
 export function startGame() {
-  score = 0;
   worldNum = Math.floor(Math.random() * worlds.length);
   world = worlds[worldNum];
   circle = {
@@ -59,6 +58,7 @@ function draw() {
   ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
   drawPipes();
   drawLaser();
+  drawScore();
 }
 
 let now;
@@ -157,6 +157,10 @@ function drawLaser() {
     ctx.fillStyle = "red";
     ctx.fillRect(las.x, las.y, las.width, las.height);
   });
+}
+
+function drawScore() {
+  ctx.fillText("Score: " + score, 5, canvas.height - 15);
 }
 
 let lasering = false;
@@ -258,7 +262,6 @@ function stop() {
 
 function incrementscore() {
   score++;
-  document.getElementById("score").innerHTML = score;
 
   if (score%3 === 0) {
     worldNum = Math.floor(Math.random() * worlds.length);
