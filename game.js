@@ -132,7 +132,6 @@ function addPipe() {
   pipes.push({world, x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
   pipes.push({world, x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
   pipes.push({world, x: canvas.width, y: gapTop + GAP_HEIGHT, width: RECT_WIDTH, height: canvas.height - (gapTop + GAP_HEIGHT), speed: WALL_SPEED, end: true });
-  
 }
 
 function drawPipes() {

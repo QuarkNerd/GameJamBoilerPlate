@@ -1,3 +1,5 @@
+const canvas = document.getElementById("screen");
+const ctx = canvas.getContext("2d");
 let analyser;
 const ac = new AudioContext();
 
@@ -12,9 +14,9 @@ let above = false;
 let currentVolText = document.getElementById("vol");
 
 async function init() {
-    const volThresholdInput = document.getElementById("volThreshold");
-    volThresholdInput.value = MIN_VOL_THRESHOLD;
-    volThresholdInput.addEventListener("input", e => MIN_VOL_THRESHOLD = e.target.value);
+    // const volThresholdInput = document.getElementById("volThreshold");
+    // volThresholdInput.value = MIN_VOL_THRESHOLD;
+    // volThresholdInput.addEventListener("input", e => MIN_VOL_THRESHOLD = e.target.value);
 
     const pitchThresholdInput = document.getElementById("pitchThreshold");
     pitchThresholdInput.value = PITCH_THRESHOLD;
@@ -51,49 +53,61 @@ function smooth(current, next) {
     return current + ((next - current) / smoothing);
 }
 
+function analyseAudioTick() {
+  const bufferLength = analyser.frequencyBinCount;
+  const buffer = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(buffer);
 
-function audioLoopTick() {
-    const bufferLength = analyser.frequencyBinCount;
-    const buffer = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(buffer);
+  let maxFrequency = ac.sampleRate / 2;
+  let binWidth = maxFrequency / bufferLength;
 
-    let maxFrequency = (ac.sampleRate / 2);
-    let binWidth = maxFrequency / bufferLength;
-
-    let maxVol = 0;
-    let pitch = 0;
-    for (let i=1; i<bufferLength-1; i++) {
-        let slidingWindow = (buffer[i-2] + buffer[i-1] + buffer[i] + buffer[i+1] + buffer[i+2]) / 5;
-        if (slidingWindow > volumeThreshold) {
-            if (slidingWindow > maxVol) {
-                maxVol = slidingWindow;
-                pitch = i * binWidth;
-            }
-        }
+  let maxVol = 0;
+  let pitch = 0;
+  for (let i = 1; i < bufferLength - 1; i++) {
+    let slidingWindow =
+      (buffer[i - 2] +
+        buffer[i - 1] +
+        buffer[i] +
+        buffer[i + 1] +
+        buffer[i + 2]) /
+      5;
+    if (slidingWindow > volumeThreshold) {
+      if (slidingWindow > maxVol) {
+        maxVol = slidingWindow;
+        pitch = i * binWidth;
+      }
     }
+  }
 
-    currentPitch = smooth(currentPitch, pitch);
-    currentVolume = smooth(currentVolume, maxVol);
+  currentPitch = smooth(currentPitch, pitch);
+  currentVolume = smooth(currentVolume, maxVol);
 
-    currentVolText.innerHTML = currentVolume.toFixed(1);
+  currentVolText.innerHTML = currentVolume.toFixed(1);
 
-    if (currentVolume > MIN_VOL_THRESHOLD) {
-        if (!above) window.dispatchEvent(new CustomEvent("noiseStart", { detail: { highPitch : currentPitch >= PITCH_THRESHOLD }}));
-        above = true;
-    } else {
-        if (currentVolume <= MIN_VOL_THRESHOLD) {
-            if (above) window.dispatchEvent(new Event("noiseStop"));
-            above = false;
-        }
+  if (currentVolume > MIN_VOL_THRESHOLD) {
+    if (!above)
+      window.dispatchEvent(
+        new CustomEvent("noiseStart", {
+          detail: { highPitch: currentPitch >= PITCH_THRESHOLD },
+        })
+      );
+    above = true;
+  } else {
+    if (currentVolume <= MIN_VOL_THRESHOLD) {
+      if (above) window.dispatchEvent(new Event("noiseStop"));
+      above = false;
     }
+  }
 }
 
-
-// function tick() {
-//     audioLoopTick();
-//     // requestAnimationFrame(tick);
-// }
-
+function drawAudioControl() {
+  // Draw the handle
+  const handleHeight = 400;
+  const handleWidth = 20;
+  const handleY = canvas.height - handleHeight;
+  ctx.fillStyle = "red";
+  ctx.fillRect(canvas.width / 2 + 5, handleY, handleWidth, handleHeight);
+}
 await init();
 
-export {audioLoopTick, ac};
+export { analyseAudioTick, ac, drawAudioControl };

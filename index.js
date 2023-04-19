@@ -1,4 +1,4 @@
-import {audioLoopTick, ac} from './input.js';
+import { analyseAudioTick, ac, drawAudioControl } from "./input.js";
 import {startGame, gameLoop} from './game.js';
 
 const canvas = document.getElementById("screen");
@@ -18,7 +18,7 @@ window.start = () => {
 }
 
 function loop() {
-  audioLoopTick();
+  analyseAudioTick();
   drawBackground();
   
   if (playing) {
@@ -52,6 +52,7 @@ function drawStartScreen() {
     drawOverlay();
     drawSeperator();
     writeIntro();
+    drawAudioControl();
 }
 
 function drawSeperator() {
@@ -78,9 +79,9 @@ function getIntro() {
     "",
     "Click/tap on the screen or press space to jump upwards. Speak/shout to fire your laser.",
     "",
-    "Walls will move in from the right, and you can eliminate the middle bits with your laser. Your goal is to survive as long as you can without hitting a wall. When not playing on easy, your firepower is limited and shown on top of the screen",
+    "Walls will move in from the right, and you can eliminate the middle bits with your laser. Your goal is to survive as long as you can without hitting a wall. When not playing on easy, your firepower is limited and shown on top of the screen.",
     "",
-    "Adjust the slider on the right to determine the therehold for firing the laser, choose your difficulty and press start",
+    "Adjust the slider on the right to determine the therehold for firing the laser, choose your difficulty and press start.",
   ];
   const sideGap = 10;
   const fontSize = 20;
