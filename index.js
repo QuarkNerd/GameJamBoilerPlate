@@ -1,4 +1,4 @@
-import { analyseAudioTick, ac, drawAudioControl } from "./input.js";
+import { analyseAudioTick, drawAudioControl, audioCanvasTouchHandler } from "./input.js";
 import {startGame, gameLoop} from './game.js';
 
 const canvas = document.getElementById("screen");
@@ -7,21 +7,27 @@ const ctx = canvas.getContext("2d");
 const backgroundImage = new Image();
 backgroundImage.src = 'img/bg.png';
 
-window.playing = false;
+window.state = 'intro';
 window.score = 0;
 
 requestAnimationFrame(loop);
 
 window.start = () => {
-  ac.resume();
   startGame();
 }
+
+canvas.addEventListener('mousedown', (e) => {
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if (state === 'intro') audioCanvasTouchHandler({x, y});
+});
 
 function loop() {
   analyseAudioTick();
   drawBackground();
   
-  if (playing) {
+  if (state === 'playing') {
     gameLoop();
   } else {
     drawStartScreen();
@@ -74,6 +80,7 @@ function writeIntro() {
 }
 
 function getIntro() {
+  ctx.font = '20px slkscr';
   const intro = [
     "Welcome to Noisy Gamer. A game that involves your voice.",
     "",

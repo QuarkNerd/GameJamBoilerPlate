@@ -1,2 +1,4 @@
 Warning when no audio coming in
 move menu stuff out to seperate file
+glitch when going offscreen allows you clip through walls
+wait on ac.resume

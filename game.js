@@ -45,7 +45,7 @@ export function startGame() {
   score = 0;
   pipes = [];
   lasers = [];
-  playing = true;
+  state = 'playing';
   
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
@@ -117,7 +117,7 @@ function updatePipeState(effectiveFrameDiff) {
   addPipesIfNeeded();
 }
 
-let lastPipeFrame = 0;
+let lastPipeFrame = -100;
 function addPipesIfNeeded() {
     if (frames - lastPipeFrame > 150) {
       addPipe();
@@ -159,6 +159,7 @@ function drawLaser() {
 }
 
 function drawScore() {
+  ctx.fillStyle = "red";
   ctx.fillText("Score: " + score, 5, canvas.height - 15);
 }
 
@@ -256,7 +257,7 @@ function noiseStart(e) {
 }
 
 function stop() {
-  playing = false;
+  state = 'intro';
 }
 
 function incrementscore() {

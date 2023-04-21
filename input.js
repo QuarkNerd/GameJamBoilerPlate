@@ -2,11 +2,11 @@ const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
 let analyser;
 const ac = new AudioContext();
-
-window.currentVolume = 0;
+let acResumed = null;
+let currentVolume = 0;
 let currentPitch = 0;
 let smoothing = 4;
-let volumeThreshold = 75;
+let volumeThreshold = 50;
 let MIN_VOL_THRESHOLD = 100;
 let PITCH_THRESHOLD = 450;
 let above = false;
@@ -14,10 +14,6 @@ let above = false;
 let currentVolText = document.getElementById("vol");
 
 async function init() {
-    // const volThresholdInput = document.getElementById("volThreshold");
-    // volThresholdInput.value = MIN_VOL_THRESHOLD;
-    // volThresholdInput.addEventListener("input", e => MIN_VOL_THRESHOLD = e.target.value);
-
     const pitchThresholdInput = document.getElementById("pitchThreshold");
     pitchThresholdInput.value = PITCH_THRESHOLD;
     pitchThresholdInput.addEventListener("input", e => PITCH_THRESHOLD = e.target.value);
@@ -100,14 +96,40 @@ function analyseAudioTick() {
   }
 }
 
+const handleX = canvas.width / 2 + 15
+const handleY = 80;
+const handleHeight = 20;
+const handleWidth = canvas.width/2 - 30;
 function drawAudioControl() {
-  // Draw the handle
-  const handleHeight = 400;
-  const handleWidth = 20;
-  const handleY = canvas.height - handleHeight;
+  ctx.font = '20px slkscr';
+  ctx.fillStyle = "White";
+  ctx.fillText("Volume threshold", handleX, handleY - 20);
+
+  ctx.fillStyle = "grey";
+  ctx.fillRect(handleX, handleY, handleWidth, handleHeight);
+  ctx.fillStyle = "white";
+  ctx.fillRect(handleX, handleY, currentVolume, handleHeight);
   ctx.fillStyle = "red";
-  ctx.fillRect(canvas.width / 2 + 5, handleY, handleWidth, handleHeight);
+  ctx.fillRect(handleX + MIN_VOL_THRESHOLD - 2, handleY - 5, 4, handleHeight + 10);
+
+  if (acResumed) return;
+  console.log(3432423423);
+  ctx.font = '14px slkscr';
+  ctx.fillText("Waiting for audio startup", handleX, handleY + handleHeight + 30);
 }
+
+function audioCanvasTouchHandler({x, y}) {
+  if (x >= handleX && x <= handleX + handleWidth && y >= handleY && y <= handleY + handleHeight) {
+    MIN_VOL_THRESHOLD = x - handleX;
+  }
+  if (acResumed === null) {
+    acResumed = false;
+    ac.resume().then(_ => {
+      acResumed = true;
+    });
+  }
+}
+
 await init();
 
-export { analyseAudioTick, ac, drawAudioControl };
+export { analyseAudioTick, drawAudioControl, audioCanvasTouchHandler };
