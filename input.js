@@ -101,6 +101,7 @@ const handleY = 80;
 const handleHeight = 20;
 const handleWidth = canvas.width/2 - 30;
 function drawAudioControl() {
+  ctx.textAlign='start';
   ctx.font = '20px slkscr';
   ctx.fillStyle = "White";
   ctx.fillText("Volume threshold", handleX, handleY - 20);

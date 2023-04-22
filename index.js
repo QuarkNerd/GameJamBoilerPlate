@@ -73,9 +73,10 @@ function writeIntro() {
   const intro = getIntro();
   ctx.font = `${intro.fontSize}px slkscr`;
   ctx.fillStyle = "White";
+  ctx.textAlign = "center"
 
-  intro.lines.forEach(({ x, y, text }) => {
-    ctx.fillText(text, x, y);
+  intro.lines.forEach(({y, text }) => {
+    ctx.fillText(text, canvas.width/4, y);
   });
 }
 
@@ -94,15 +95,15 @@ function getIntro() {
   const fontSize = 20;
   const lineHeight = fontSize + 2;
   const targetWdith = canvas.width / 2 - 2 * sideGap;
-  const parsedIntro = intro.flatMap((st) =>
+  const lines = intro.flatMap((st) =>
     splitStringByLength(st, targetWdith)
   );
-  const lines = parsedIntro.length;
-  const topGap = (canvas.height - lines * lineHeight) / 2;
-  parsedIntro.forEach((chunk, i) => {
-    chunk.x = (targetWdith - chunk.width) / 2 + sideGap;
-    chunk.y = topGap + lineHeight * i;
-  });
+  const lineCount = lines.length;
+  const topGap = (canvas.height - lineCount * lineHeight) / 2;
+  const parsedIntro = lines.map((text, i) => ({
+    text,
+    y:topGap + lineHeight * i
+  }));
 
   return { lines: parsedIntro, fontSize };
 }
@@ -116,19 +117,13 @@ function splitStringByLength(str, length) {
     const word = words[i];
 
     if (ctx.measureText(currentChunk + " " + word).width > length) {
-      chunks.push({
-        text: currentChunk.trim(),
-        width: ctx.measureText(currentChunk.trim()).width,
-      });
+      chunks.push(currentChunk.trim());
       currentChunk = "";
     }
 
     currentChunk += (currentChunk === "" ? "" : " ") + word;
   }
 
-  chunks.push({
-    text: currentChunk.trim(),
-    width: ctx.measureText(currentChunk.trim()).width,
-  });
+  chunks.push(currentChunk.trim());
   return chunks;
 }
