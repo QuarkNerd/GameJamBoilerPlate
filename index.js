@@ -7,21 +7,24 @@ const ctx = canvas.getContext("2d");
 const backgroundImage = new Image();
 backgroundImage.src = 'img/bg.png';
 
+// Global variables, not ideal
 window.state = 'intro';
 window.score = 0;
 
 requestAnimationFrame(loop);
-
-window.start = () => {
-  startGame();
-}
 
 canvas.addEventListener('mousedown', (e) => {
   const rect = e.target.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
   if (state === 'intro') audioCanvasTouchHandler({x, y});
+  if (state === 'playing') return;
+  mainTouchHandler({x, y});
 });
+
+function mainTouchHandler({x, y}) {
+  startGame();
+}
 
 function loop() {
   analyseAudioTick();
@@ -30,7 +33,7 @@ function loop() {
   if (state === 'playing') {
     gameLoop();
   } else {
-    drawStartScreen();
+    drawMenu();
   }
 
   requestAnimationFrame(loop);
@@ -54,12 +57,13 @@ function drawOverlay() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawStartScreen() {
+function drawMenu() {
     drawOverlay();
     drawSeperator();
     writeIntro();
     drawAudioControl();
 }
+
 
 function drawSeperator() {
   ctx.strokeStyle = 'white';

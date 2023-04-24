@@ -51,7 +51,6 @@ export function startGame() {
   window.addEventListener("keyup", handleKeyUp);
   window.addEventListener("noiseStart", startLaser);
   window.addEventListener("noiseStop", endLaser);
-  document.getElementById('start').blur();
 }
 
 function draw() {
@@ -159,7 +158,9 @@ function drawLaser() {
 }
 
 function drawScore() {
+  ctx.font = '20px slkscr';
   ctx.fillStyle = "red";
+  ctx.textAlign = "start";
   ctx.fillText("Score: " + score, 5, canvas.height - 15);
 }
 
@@ -243,7 +244,7 @@ function unjump() {
   lastJumpFrame =-100;
 }
 
-function noiseStart(e) {
+// function noiseStart(e) {
   // if (e.detail.highPitch) {
   //   laser();
   //   jump();
@@ -251,10 +252,10 @@ function noiseStart(e) {
   //   jump();
   // }
 
-  startLaser();
+//   startLaser();
 
   // e.detail.highPitch ? laser() : jump();
-}
+// }
 
 function stop() {
   state = 'intro';
@@ -286,7 +287,6 @@ function RectCircleColliding(circle,rect){
 }
 
 function checkOverlap(rect1, rect2) {
-  // Calculate the x and y coordinates of the edges of each rectangle
   const rect1Left = rect1.x;
   const rect1Right = rect1.x + rect1.width;
   const rect1Top = rect1.y;
@@ -296,27 +296,9 @@ function checkOverlap(rect1, rect2) {
   const rect2Right = rect2.x + rect2.width;
   const rect2Top = rect2.y;
   const rect2Bottom = rect2.y + rect2.height;
-  
-  // Check if the rectangles overlap in the x and y axes
+
   const xOverlap = rect1Left < rect2Right && rect1Right > rect2Left;
   const yOverlap = rect1Top < rect2Bottom && rect1Bottom > rect2Top;
   
-  // Return true if the rectangles overlap in both axes, false otherwise
   return xOverlap && yOverlap;
 }
-
-const gravityConfig = document.getElementById("gravConfig");
-gravityConfig.value = GRAVITY;
-gravityConfig.addEventListener("input", e => GRAVITY = Number(e.target.value));
-
-const jumpConfig = document.getElementById("jumpConfig");
-jumpConfig.value = JUMP_SPEED;
-jumpConfig.addEventListener("input", e => JUMP_SPEED = Number(e.target.value));
-
-const speedConfig = document.getElementById("speedConfig");
-speedConfig.value = WALL_SPEED;
-speedConfig.addEventListener("input", e => WALL_SPEED = Number(e.target.value));
-
-const laserConfig = document.getElementById("laserConfig");
-laserConfig.value = LASER_SPEED;
-laserConfig.addEventListener("input", e => LASER_SPEED = Number(e.target.value));

@@ -11,12 +11,9 @@ let MIN_VOL_THRESHOLD = 100;
 let PITCH_THRESHOLD = 450;
 let above = false;
 
-let currentVolText = document.getElementById("vol");
+init();
 
 async function init() {
-    const pitchThresholdInput = document.getElementById("pitchThreshold");
-    pitchThresholdInput.value = PITCH_THRESHOLD;
-    pitchThresholdInput.addEventListener("input", e => PITCH_THRESHOLD = e.target.value);
 
     analyser = ac.createAnalyser();
     analyser.fftSize = 4096;
@@ -78,8 +75,6 @@ function analyseAudioTick() {
   currentPitch = smooth(currentPitch, pitch);
   currentVolume = smooth(currentVolume, maxVol);
 
-  currentVolText.innerHTML = currentVolume.toFixed(1);
-
   if (currentVolume > MIN_VOL_THRESHOLD) {
     if (!above)
       window.dispatchEvent(
@@ -114,7 +109,6 @@ function drawAudioControl() {
   ctx.fillRect(handleX + MIN_VOL_THRESHOLD - 2, handleY - 5, 4, handleHeight + 10);
 
   if (acResumed) return;
-  console.log(3432423423);
   ctx.font = '14px slkscr';
   ctx.fillText("Waiting for audio startup", handleX, handleY + handleHeight + 30);
 }
@@ -130,7 +124,5 @@ function audioCanvasTouchHandler({x, y}) {
     });
   }
 }
-
-await init();
 
 export { analyseAudioTick, drawAudioControl, audioCanvasTouchHandler };
