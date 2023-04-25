@@ -5,6 +5,7 @@ import {
   gameTouchStopHandler,
 } from "./game.js";
 import { drawMenu, menuTouchHandler } from "./menu.js";
+import { endGameClickHandler, endGameLoop } from "./endgame.js";
 
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
@@ -31,6 +32,8 @@ function loop() {
     case 'menu':
       drawMenu();
       break;
+    case 'endgame':
+      endGameLoop();
   }
 
   requestAnimationFrame(loop);
@@ -47,11 +50,12 @@ canvas.addEventListener('mousedown', (e) => {
     case 'playing': 
       gameTouchStartHandler();
       break;
+    case 'endgame': 
+      endGameClickHandler({ x, y });
+      break;
   }
 });
-  console.log(33333);
 canvas.addEventListener('mouseup', () => {
-  console.log(22222, state);
   switch (state) {
     case 'playing': 
       gameTouchStopHandler();

@@ -279,7 +279,7 @@ function unjump() {
 // }
 
 function stop() {
-  state = 'menu';
+  state = 'endgame';
 }
 
 function incrementscore() {
