@@ -89,17 +89,22 @@ function analyseAudioTick() {
       above = false;
     }
   }
+
+  if (currentVolume > 1) {
+    acResumed = true;
+  }
 }
 
 const handleX = canvas.width / 2 + 15
-const handleY = 80;
+const handleY = 100;
 const handleHeight = 20;
 const handleWidth = canvas.width/2 - 30;
 function drawAudioControl() {
   ctx.textAlign='start';
   ctx.font = '20px slkscr';
   ctx.fillStyle = "White";
-  ctx.fillText("Volume threshold", handleX, handleY - 20);
+  ctx.fillText("Volume threshold", handleX, handleY - 40);
+  ctx.fillText("Click to set:", handleX, handleY - 20);
 
   ctx.fillStyle = "grey";
   ctx.fillRect(handleX, handleY, handleWidth, handleHeight);
