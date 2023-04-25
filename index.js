@@ -1,5 +1,9 @@
 import { analyseAudioTick } from "./input.js";
-import { gameLoop} from './game.js';
+import {
+  gameLoop,
+  gameTouchStartHandler,
+  gameTouchStopHandler,
+} from "./game.js";
 import { drawMenu, menuTouchHandler } from "./menu.js";
 
 const canvas = document.getElementById("screen");
@@ -36,8 +40,23 @@ canvas.addEventListener('mousedown', (e) => {
   const rect = e.target.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
-  if (state === 'menu') menuTouchHandler({x, y});
-  if (state === 'playing') return;
+  switch (state) {
+    case 'menu': 
+      menuTouchHandler({ x, y });
+      break;
+    case 'playing': 
+      gameTouchStartHandler();
+      break;
+  }
+});
+  console.log(33333);
+canvas.addEventListener('mouseup', () => {
+  console.log(22222, state);
+  switch (state) {
+    case 'playing': 
+      gameTouchStopHandler();
+      break;
+  }
 });
 
 let bgOffset = 0;

@@ -15,7 +15,7 @@ const CIRCLE_RADIUS = 15;
 
 const laserAmmoMap = {
   "easy": Infinity,
-  "medium": 10,
+  "medium": 6,
   "hard": 3,
 }
 
@@ -74,6 +74,10 @@ function draw() {
   drawLaser();
   drawDetails();
 }
+
+export const gameTouchStartHandler = jump;
+export const gameTouchStopHandler = unjump;
+
 
 let now;
 let frames = 0;
