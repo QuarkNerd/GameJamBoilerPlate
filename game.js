@@ -258,7 +258,7 @@ function unjump() {
 // }
 
 function stop() {
-  state = 'intro';
+  state = 'menu';
 }
 
 function incrementscore() {
