@@ -12,6 +12,19 @@ const images = {};
 const idealFrameTime = 1000/60;
 
 const CIRCLE_RADIUS = 15;
+
+const laserAmmoMap = {
+  "easy": Infinity,
+  "medium": 10,
+  "hard": 3,
+}
+
+const gapFactorMap = {
+  "easy": 15,
+  "medium": 12,
+  "hard": 10,
+}
+
 let GRAVITY = 0.3;
 let JUMP_SPEED = 8;
 let WALL_SPEED = 3;
@@ -25,6 +38,7 @@ let circle = {
   vy: 0
 };
 
+let laserAmmo;
 let pipes = [];
 let lasers = [];
 
@@ -46,6 +60,7 @@ export function startGame() {
   pipes = [];
   lasers = [];
   state = 'playing';
+  laserAmmo = laserAmmoMap[difficulty];
   
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
@@ -57,7 +72,7 @@ function draw() {
   ctx.drawImage(images["ship"], circle.x - 15, circle.y - 15);
   drawPipes();
   drawLaser();
-  drawScore();
+  drawDetails();
 }
 
 let now;
@@ -126,7 +141,7 @@ function addPipesIfNeeded() {
 
 function addPipe() {
   const RECT_WIDTH = 50;
-  const GAP_HEIGHT = CIRCLE_RADIUS*15;
+  const GAP_HEIGHT = CIRCLE_RADIUS * gapFactorMap[difficulty];
   const gapTop = Math.floor(Math.random() * (canvas.height - GAP_HEIGHT));
   pipes.push({world, x: canvas.width, y: 0, width: RECT_WIDTH, height: gapTop, speed: WALL_SPEED });
   pipes.push({world, x: canvas.width + 5, y: gapTop, width: RECT_WIDTH - 10, height: GAP_HEIGHT, speed: WALL_SPEED, gap: true });
@@ -157,17 +172,18 @@ function drawLaser() {
   });
 }
 
-function drawScore() {
+function drawDetails() {
   ctx.font = '20px slkscr';
   ctx.fillStyle = "red";
   ctx.textAlign = "start";
   ctx.fillText("Score: " + score, 5, canvas.height - 15);
+  ctx.fillText("Ammo: " + laserAmmo, 5, 15);
 }
 
 let lasering = false;
 let lastLaserFrame = -100;
 function fireLaserIfNeeded() {
-  if (!lasering) return;
+  if (!lasering || laserAmmo === 0) return;
   if (frames - lastLaserFrame < 20) return;
   lastLaserFrame = frames;
   lasers.push({
@@ -176,7 +192,8 @@ function fireLaserIfNeeded() {
     vy: 0,
     height:10,
     width: 30
-  })
+  });
+  laserAmmo--;
 }
 
 let lastJumpFrame=-100;
@@ -263,6 +280,7 @@ function stop() {
 
 function incrementscore() {
   score++;
+  laserAmmo += laserAmmoMap[difficulty];
 
   if (score%3 === 0) {
     worldNum = Math.floor(Math.random() * worlds.length);

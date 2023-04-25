@@ -13,36 +13,29 @@ export function drawMenu() {
 }
 
 export function menuTouchHandler({ x, y }) {
-  const buttonPressed = buttons.find(btn => 
-    btn.x - btn.width/2 <= x && btn.x + btn.width/2 && btn.y - btn.height/2 <= y && btn.y + btn.height/2 >= y
-  )
-  
+  const buttons = getButtons();
+  const buttonPressed = buttons.find(
+    (btn) =>
+      btn.x - btn.width / 2 <= x &&
+      btn.x + btn.width / 2 >= x &&
+      btn.y - btn.height / 2 <= y &&
+      btn.y + btn.height / 2 >= y
+  );
+
   if (!buttonPressed) {
     audioCanvasTouchHandler({ x, y });
     return;
   }
-
-  switch (buttonPressed.text) {
-    case "start":
-      startGame();
+  if (buttonPressed.text === "start") {
+    startGame();
+  } else {
+    difficulty = buttonPressed.text;
   }
-
 }
 
 function drawButtons() {
-  buttons.forEach((btn) => drawButton(ctx, btn));
+  getButtons().forEach((btn) => drawButton(ctx, btn));
 }
-
-const buttons = [
-  {
-    x: (3 * canvas.width) / 4,
-    y: canvas.height - 50,
-    width: 100,
-    height: 40,
-    color: "grey",
-    text: "start",
-  },
-];
 
 function drawSeperator() {
   ctx.strokeStyle = "white";
@@ -61,6 +54,48 @@ function writeIntro() {
   intro.lines.forEach(({ y, text }) => {
     ctx.fillText(text, canvas.width / 4, y);
   });
+}
+
+function getButtons() {
+  const buttons = [
+    {
+      x: (3 * canvas.width) / 4,
+      y: canvas.height - 50,
+      width: 100,
+      height: 40,
+      color: "grey",
+      text: "start",
+    },
+    {
+      x: (3 * canvas.width) / 4 - 110,
+      y: canvas.height - 110,
+      width: 100,
+      height: 40,
+      color: "grey",
+      text: "easy",
+    },
+    {
+      x: (3 * canvas.width) / 4,
+      y: canvas.height - 110,
+      width: 100,
+      height: 40,
+      color: "grey",
+      text: "medium",
+    },
+    {
+      x: (3 * canvas.width) / 4 + 110,
+      y: canvas.height - 110,
+      width: 100,
+      height: 40,
+      color: "grey",
+      text: "hard",
+    },
+  ];
+
+  buttons.forEach((btn) =>
+    difficulty === btn.text ? (btn.color = "green") : null
+  );
+  return buttons;
 }
 
 function getIntro() {
