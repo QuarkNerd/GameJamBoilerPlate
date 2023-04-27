@@ -122,12 +122,22 @@ function audioCanvasTouchHandler({x, y}) {
   if (x >= handleX && x <= handleX + handleWidth && y >= handleY && y <= handleY + handleHeight) {
     MIN_VOL_THRESHOLD = x - handleX;
   }
+}
+
+function startAudioContext() {
   if (acResumed === null) {
     acResumed = false;
-    ac.resume().then(_ => {
+    ac.resume().then((_) => {
       acResumed = true;
     });
   }
+
+  document.removeEventListener("mousemove", startAudioContext);
+  document.removeEventListener("mousedown", startAudioContext);
+  document.removeEventListener("touchstart", startAudioContext);
 }
+document.addEventListener('mousemove', startAudioContext);
+document.addEventListener('mousedown', startAudioContext);
+document.addEventListener('touchstart', startAudioContext);
 
 export { analyseAudioTick, drawAudioControl, audioCanvasTouchHandler };

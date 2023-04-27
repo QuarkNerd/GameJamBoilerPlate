@@ -5,7 +5,7 @@ import {
   gameTouchStopHandler,
 } from "./game.js";
 import { drawMenu, menuTouchHandler } from "./menu.js";
-import { endGameClickHandler, endGameLoop } from "./endgame.js";
+import { preMenuClickHandler, preMenuLoop } from "./premenu.js";
 
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
@@ -14,7 +14,7 @@ const backgroundImage = new Image();
 backgroundImage.src = 'img/bg.png';
 
 // Global variables, not ideal
-window.state = 'menu';
+window.state = 'enter';
 window.score = 0;
 window.difficulty = 'easy';
 
@@ -26,14 +26,18 @@ function loop() {
   if (state !== 'playing') drawOverlay();
   
   switch (state) {
-    case 'playing':
+    case "playing":
       gameLoop();
       break;
-    case 'menu':
+    case "menu":
       drawMenu();
       break;
-    case 'endgame':
-      endGameLoop();
+    case "enter":
+      preMenuLoop(true);
+      break;
+    case "endgame":
+      preMenuLoop();
+      break;
   }
 
   requestAnimationFrame(loop);
@@ -50,8 +54,9 @@ canvas.addEventListener('mousedown', (e) => {
     case 'playing': 
       gameTouchStartHandler();
       break;
-    case 'endgame': 
-      endGameClickHandler({ x, y });
+    case 'enter': 
+    case 'endgame':
+      preMenuClickHandler({ x, y });
       break;
   }
 });

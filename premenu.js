@@ -3,15 +3,19 @@ import { drawButton } from "./utils.js";
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
 
-export function endGameLoop() {
+export function preMenuLoop(start) {
   ctx.font = `40px slkscr`;
   ctx.fillStyle = "White";
   ctx.textBaseline = "middle";
-  ctx.fillText(`Final score: ${score}`, canvas.width / 2, canvas.height / 2 - 80);
-  drawButton(ctx, getContinueButton());
+  ctx.fillText(
+    start ? 'Noisy Gamer' : `Final score: ${score}`, 
+    canvas.width / 2, 
+    canvas.height / 2 - 80
+    );
+  drawButton(ctx, getContinueButton(start));
 }
 
-export function endGameClickHandler({ x, y }) {
+export function preMenuClickHandler({ x, y }) {
   const btn = getContinueButton();
 
   if (
@@ -24,13 +28,13 @@ export function endGameClickHandler({ x, y }) {
   }
 }
 
-function getContinueButton() {
+function getContinueButton(start) {
   return {
     x: canvas.width / 2,
     y: canvas.height / 2 - 20,
     width: 120,
     height: 40,
     color: "grey",
-    text: "continue",
+    text: start ? "enter" : "continue",
   };
 }
