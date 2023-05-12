@@ -19,3 +19,6 @@ NoisyGamer is a game about about firing lasers by shouting at your screen. Any s
  * Make it past as many walls as you can
 5. Destroy your friends' scores
 
+## Code
+
+Yeah the code isnt the best, most of the basis was written during a hackathon.

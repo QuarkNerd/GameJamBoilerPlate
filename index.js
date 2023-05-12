@@ -85,3 +85,8 @@ function drawOverlay() {
   ctx.fillStyle = "rgba(30, 30, 30, 0.9)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
+
+// PWA
+document.ondblclick = function (e) {
+  e.preventDefault();
+};

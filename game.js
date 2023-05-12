@@ -1,9 +1,9 @@
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
-const worlds = ["mario", "minecraft", "missing"];
+const worlds = ["minecraft", "missing"];
 const images = {};
 
-["mario", "mariowall", "minecraft", "minecraftwall", "missing", "missingwall", "ship"].forEach(fileName => {
+["minecraft", "minecraftwall", "missing", "missingwall", "ship"].forEach(fileName => {
   const img = new Image();
   img.src = `img/${fileName}.png`;
   images[fileName] = img;
@@ -66,6 +66,7 @@ export function startGame() {
   window.addEventListener("keyup", handleKeyUp);
   window.addEventListener("noiseStart", startLaser);
   window.addEventListener("noiseStop", endLaser);
+  window.addEventListener("touchstart", doJump);
 }
 
 function draw() {
@@ -129,6 +130,7 @@ function updateLaserState(effectiveFrameDiff) {
 function updatePipeState(effectiveFrameDiff) {
   pipes.forEach(pipe => pipe.x -= pipe.speed*effectiveFrameDiff);
   if (pipes.some(rect => rect.x + rect.width <= 0)) {
+    if (pipes.some((rect) => rect.x + rect.width <= 0 && rect.gap)) stop();
     incrementscore();
     pipes = pipes.filter(rect => rect.x + rect.width >= 0);
   }
@@ -203,7 +205,11 @@ function fireLaserIfNeeded() {
 let lastJumpFrame=-100;
 function jumpIfShould(e) {
   if (!jumping) return;
-  if (frames - lastJumpFrame < 30) return;
+  doJump();
+}
+
+function doJump() {
+  if (frames - lastJumpFrame < 20) return;
   lastJumpFrame = frames;
   circle.vy = -JUMP_SPEED;
 }
@@ -264,19 +270,6 @@ function unjump() {
   jumping = false;
   lastJumpFrame =-100;
 }
-
-// function noiseStart(e) {
-  // if (e.detail.highPitch) {
-  //   laser();
-  //   jump();
-  // } else {
-  //   jump();
-  // }
-
-//   startLaser();
-
-  // e.detail.highPitch ? laser() : jump();
-// }
 
 function stop() {
   state = 'endgame';

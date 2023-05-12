@@ -1,6 +1,6 @@
 import { drawAudioControl, audioCanvasTouchHandler } from "./input.js";
 import { startGame } from "./game.js";
-import { drawButton } from "./utils.js";
+import { drawButton, parseText } from "./utils.js";
 
 const canvas = document.getElementById("screen");
 const ctx = canvas.getContext("2d");
@@ -99,47 +99,15 @@ function getButtons() {
 }
 
 function getIntro() {
-  ctx.font = "20px slkscr";
   const intro = [
-    "Welcome to Noisy Gamer. A game that involves your voice.",
+    "This is Noisy Gamer. A game that involves your voice.",
     "",
-    "Click/tap on the screen or press space to jump upwards. Speak/shout to fire your laser.",
+    "Click/tap on the screen or press space to jump upwards. Speak/shout to fire your laser. Any sound works, but a high-pitched 'pew' is supreme",
     "",
     "Walls will move in from the right, and you can eliminate the middle bits with your laser. Your goal is to survive as long as you can without hitting a wall. When not playing on easy, your firepower is limited and shown on top of the screen.",
     "",
     "Adjust the slider on the right to determine the therehold for firing the laser, choose your difficulty and press start.",
   ];
-  const sideGap = 10;
-  const fontSize = 20;
-  const lineHeight = fontSize + 2;
-  const targetWdith = canvas.width / 2 - 2 * sideGap;
-  const lines = intro.flatMap((st) => splitStringByLength(st, targetWdith));
-  const lineCount = lines.length;
-  const topGap = (canvas.height - lineCount * lineHeight) / 2;
-  const parsedIntro = lines.map((text, i) => ({
-    text,
-    y: topGap + lineHeight * i,
-  }));
-
-  return { lines: parsedIntro, fontSize };
-}
-
-function splitStringByLength(str, length) {
-  const words = str.split(" ");
-  const chunks = [];
-  let currentChunk = "";
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-
-    if (ctx.measureText(currentChunk + " " + word).width > length) {
-      chunks.push(currentChunk.trim());
-      currentChunk = "";
-    }
-
-    currentChunk += (currentChunk === "" ? "" : " ") + word;
-  }
-
-  chunks.push(currentChunk.trim());
-  return chunks;
+  const targetWidth = canvas.width / 2 - 20;
+  return parseText(intro, 20, targetWidth, 40, ctx);
 }
