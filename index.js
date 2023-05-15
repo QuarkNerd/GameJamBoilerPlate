@@ -43,8 +43,8 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-canvas.addEventListener('mousedown', (e) => {
-  const rect = e.target.getBoundingClientRect();
+document.addEventListener('mousedown', (e) => {
+  const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
   switch (state) {
@@ -60,7 +60,7 @@ canvas.addEventListener('mousedown', (e) => {
       break;
   }
 });
-canvas.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', () => {
   switch (state) {
     case 'playing': 
       gameTouchStopHandler();
