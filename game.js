@@ -182,7 +182,7 @@ function drawDetails() {
   ctx.font = '20px slkscr';
   ctx.fillStyle = "red";
   ctx.textAlign = "start";
-  ctx.fillText("Score: " + score, 5, canvas.height - 15);
+  ctx.fillText("Score: " + score, 5, canvas.height - 20);
   ctx.fillText("Ammo: " + laserAmmo, 5, 15);
 }
 

@@ -162,7 +162,7 @@ document.addEventListener("touchstart", startAudioContext);
 
 function getWaitingAudioContextInstruction() {
   const lines = [
-    "Waiting for audio startup, this can take a while. A dedicated mic can be quicker/better",
+    "Waiting for audio startup, this can take a while. An external mic can be quicker/better",
     "",
     "It might help to close other apps/sites using your mic, including other instances of this site."
   ];
@@ -174,7 +174,7 @@ function getPostAudioContextInstruction() {
   const lines = [
     "If your voice (white bar) crosses the threshold (red line), lasers will fire.",
     "",
-    "Dedicated mics work better than built-in ones",
+    "External mics work better than built-in ones",
     "",
     "If audio isn't being picked up, close anything that could be using the mic, including other instances of this site. Refresh",
   ];
