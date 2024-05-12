@@ -164,7 +164,9 @@ function getWaitingAudioContextInstruction() {
   const lines = [
     "Waiting for audio startup, this can take a while. An external mic can be quicker/better",
     "",
-    "It might help to close other apps/sites using your mic, including other instances of this site."
+    "It might help to close other apps/sites using your mic, including other instances of this site.",
+    "",
+    "After a couple of minutes if nothing happens reload the page"
   ];
   const targetWidth = canvas.width / 2 - 20;
   return parseText(lines, 20, targetWidth, 140, ctx);
